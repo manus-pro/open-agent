@@ -9,7 +9,7 @@ This Python Agent is a modular and extensible system designed to autonomously or
 - Execute browser tasks using Selenium
 - Conduct web research using the Firecrawl API
 
-The design draws inspiration from the modularity and multi-modal task execution of the [Owl Project](https://github.com/camel-ai/owl.git) and [OpenManus](https://github.com/mannaandpoem/OpenManus).
+The design draws inspiration from the modularity and multi-modal task execution of the [Owl Project](https://github.com/camel-ai/owl.git) and [OpenManus](https://github.com/mannaandpoem/OpenManus). This project has been refactored into **OpenAgent**.
 
 ---
 
@@ -58,7 +58,7 @@ The design draws inspiration from the modularity and multi-modal task execution 
 The following directory structure is suggested to maintain a clear separation of concerns, inspired by [OpenManus](https://github.com/mannaandpoem/OpenManus):
 
 ```
-└── open-manus/
+└── open-agent/
     ├── README.md
     ├── LICENSE
     ├── README_zh.md

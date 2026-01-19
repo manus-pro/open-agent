@@ -8,7 +8,7 @@ from typing import Dict, Any, Optional
 load_dotenv()
 
 class Config:
-    """Configuration manager for OpenManus."""
+    """Configuration manager for OpenAgent."""
     
     def __init__(self, config_path: Optional[str] = None):
         """
@@ -23,7 +23,7 @@ class Config:
         default_paths = [
             os.path.join(os.getcwd(), "config", "config.toml"),
             os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", "config.toml"),
-            os.path.expanduser("~/.config/open-manus/config.toml"),
+            os.path.expanduser("~/.config/open-agent/config.toml"),
         ]
         
         # Load config file

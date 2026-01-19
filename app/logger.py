@@ -49,7 +49,7 @@ def setup_logger(name, level=logging.INFO, log_file=None, rotation='midnight', f
     
     return logger
 
-def get_logger(name="open-manus", config=None):
+def get_logger(name="open-agent", config=None):
     """
     Get a logger with configuration from the config file.
     

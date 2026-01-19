@@ -3,7 +3,7 @@ import asyncio
 from app.agent.manus import Manus
 from app.logger import get_logger
 
-logger = get_logger("open-manus")
+logger = get_logger("open-agent")
 
 
 async def main():

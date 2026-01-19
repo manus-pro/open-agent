@@ -1,0 +1,8 @@
+This is a placeholder. Please create an architecture diagram showing:
+
+1. User Input Layer (top)
+2. Agent Layer (middle) - showing Primary, Planning, ReAct, SWE agents inheriting from BaseAgent
+3. Tool Layer (bottom) - showing PDF, Markdown, Code, Firecrawl, Browser tools in Tool Registry
+4. Arrows showing data flow between layers
+
+Recommended tools: draw.io, Mermaid, or Python matplotlib/networkx

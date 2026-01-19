@@ -10,7 +10,7 @@ from app.flow.flow_factory import create_flow
 
 def parse_args():
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(description="Run an OpenManus flow")
+    parser = argparse.ArgumentParser(description="Run an OpenAgent flow")
     parser.add_argument("--config", type=str, help="Path to the config file")
     parser.add_argument("--flow", type=str, required=True, help="Name of the flow to run")
     parser.add_argument("--input", type=str, help="Path to the input file")

@@ -1,164 +1,210 @@
-# OpenManus - Python Agent System
-[![Discord](https://img.shields.io/badge/Join-Discord-5865F2?logo=discord&logoColor=white)](https://discord.gg/jkT5udP9bw)
-[![Twitter](https://img.shields.io/badge/Follow-@xinyzng-1DA1F2?logo=twitter&logoColor=white)](https://x.com/xinyzng)
+# OpenAgent
 
-ManusPro is an agent-based system that can execute tasks, generate documents, conduct research, and more.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](./tests)
+[![JOSS](https://img.shields.io/badge/JOSS-submitted-orange.svg)](https://joss.theoj.org/)
 
-## Demo video
-https://github.com/user-attachments/assets/9af20224-d496-4b54-9634-d72c7c8139b7
+**OpenAgent** is a modular framework for building autonomous AI agents that can decompose complex tasks, orchestrate multiple tools, and maintain context through memory-enabled execution.
 
-Checkout the frontend branch:
-<img width="1307" alt="image" src="https://github.com/user-attachments/assets/9059d1b4-ba4e-422e-94b3-fee693a3411b" />
+## Key Features
+
+- **Hierarchical Agent Architecture**: Specialized agents (Manus, Planning, ReAct, SWE) with distinct reasoning paradigms
+- **Memory-Enabled Planning**: Context persistence across multi-step workflows
+- **Extensible Tool Framework**: Dynamic tool registration and discovery via the Tool Registry pattern
+- **Multi-Modal Task Execution**: Document generation, web research, code synthesis, and browser automation
+- **Graceful Degradation**: LLM-based fallback when tool execution fails
 
 ## Installation
 
-1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/open-manus.git
-cd open-manus/python
-```
+# Clone the repository
+git clone https://github.com/manus-pro/open-agent.git
+cd open-agent
 
-2. Install the required dependencies:
-```bash
+# Install dependencies
 pip install -r requirements.txt
+
+# Configure API keys
+cp config/config.example.toml config/config.toml
+# Edit config.toml with your API keys
 ```
 
-3. Optional dependencies:
-- For generating visualizations in PDFs: `pip install matplotlib numpy`
+### Environment Variables
 
-## Features
-
-- Task planning and execution
-- Document generation
-  - PDF generation with data tables and visualizations (auto-opens generated PDFs)
-  - Markdown generation with auto-open capability
-- Web research using Firecrawl API
-- Code generation and automatic execution
-- Terminal command integration
-- Artifact management and tracking
-- Conversation handling
-
-## Configuration
-
-Create a `.env` file in the project root with your API keys:
-
-```
-OPENAI_API_KEY=your_openai_key
-FIRECRAWL_API_KEY=your_firecrawl_key  # For web research capabilities
-# Optional: If using Claude
-ANTHROPIC_API_KEY=your_anthropic_key
+```bash
+export OPENAI_API_KEY="your_openai_key"
+export FIRECRAWL_API_KEY="your_firecrawl_key"  # Optional: for web research
+export ANTHROPIC_API_KEY="your_anthropic_key"  # Optional: for Claude
 ```
 
-## Usage
+## Quick Start
 
 ```python
 from app.agent.manus import Manus
 import asyncio
 
-# Create Manus agent
-agent = Manus()
-
-# Run a task
 async def main():
-    await agent.run("Generate a report about renewable energy technologies")
+    agent = Manus()
+    await agent.run("Research quantum computing and generate a PDF report")
 
-if __name__ == "__main__":
-    asyncio.run(main())
+asyncio.run(main())
 ```
 
-## Document Generation
+## Architecture
 
-OpenManus can generate different types of documents:
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        User Input                           │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                     Agent Layer                              │
+│  ┌─────────┐ ┌──────────┐ ┌─────────┐ ┌─────────────────┐  │
+│  │  Manus  │ │ Planning │ │  ReAct  │ │       SWE       │  │
+│  └────┬────┘ └────┬─────┘ └────┬────┘ └────────┬────────┘  │
+│       └───────────┴────────────┴───────────────┘            │
+│                          │                                   │
+│                    BaseAgent                                 │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                      Tool Layer                              │
+│  ┌─────────────┐ ┌──────────────┐ ┌───────────────────┐    │
+│  │     PDF     │ │   Markdown   │ │   Code Generator  │    │
+│  │  Generator  │ │  Generator   │ │                   │    │
+│  └─────────────┘ └──────────────┘ └───────────────────┘    │
+│  ┌─────────────┐ ┌──────────────┐ ┌───────────────────┐    │
+│  │  Firecrawl  │ │   Browser    │ │    Bash/Python    │    │
+│  │  Research   │ │  Automation  │ │     Execute       │    │
+│  └─────────────┘ └──────────────┘ └───────────────────┘    │
+│                    Tool Registry                             │
+└─────────────────────────────────────────────────────────────┘
+```
 
-### PDF Generation
+## Agents
+
+| Agent | Description | Use Case |
+|-------|-------------|----------|
+| **Manus** | Primary orchestrator using OpenAI Functions with task-type inference | General-purpose task execution |
+| **Planning** | Memory-enabled multi-step execution with artifact tracking | Complex research workflows |
+| **ReAct** | Thought-Action-Observation cycles with reasoning traces | Iterative problem-solving |
+| **SWE** | Five-phase workflow (Understand→Plan→Implement→Verify→Iterate) | Code generation and debugging |
+
+## Tools
+
+| Tool | Description |
+|------|-------------|
+| `pdf_generator` | Generate formatted PDF documents with ReportLab |
+| `markdown_generator` | Create structured Markdown files |
+| `code_generator` | Multi-language code synthesis with execution |
+| `firecrawl_research` | Web research via Firecrawl API |
+| `bash` | Shell command execution with timeout |
+| `python_execute` | Python code execution in-process/subprocess |
+| `file_saver` | File persistence to filesystem |
+| `str_replace_editor` | Text/code file editing via search-replace |
+
+## Examples
+
+### Document Generation
 
 ```python
 from app.tool.pdf_generator import PDFGeneratorTool
 
 pdf_tool = PDFGeneratorTool()
 result = pdf_tool.run(
-    content="# This is a PDF report\n\nContent goes here...",
-    title="Sample Report",
-    options={"auto_open": True}  # Automatically open the PDF after generation
+    content="# Report Title\n\nContent here...",
+    title="My Report",
+    options={"auto_open": True}
 )
-print(f"PDF created at: {result['artifact_path']}")
 ```
 
-### Markdown Generation
+### Multi-Step Planning
 
 ```python
-from app.tool.markdown_generator import MarkdownGeneratorTool
+from app.agent.planning import PlanningAgent
+from app.schema import TaskInput
 
-md_tool = MarkdownGeneratorTool()
-result = md_tool.run(
-    content="## This is a Markdown document\n\nContent goes here...",
-    title="Sample Document",
-    options={"auto_open": True}  # Automatically open the markdown file
+agent = PlanningAgent()
+task = TaskInput(
+    task_description="Research AI agents and create a summary",
+    parameters={
+        "plan": [
+            "Search for recent AI agent papers",
+            "Extract key findings",
+            "Generate PDF report"
+        ],
+        "memory_enabled": True
+    }
 )
-print(f"Markdown created at: {result['artifact_path']}")
-```
-
-## Code Generation and Execution
-
-Generate and automatically execute code:
-
-```python
-from app.tool.code_generator import CodeGeneratorTool
-
-code_tool = CodeGeneratorTool()
-result = code_tool.run(
-    description="Create a function that calculates the factorial of a number",
-    language="python"  # Code will be auto-executed if it's safe
-)
-print(f"Code created at: {result['artifact_path']}")
-if result.get("executed"):
-    print(f"Execution result: {result['execution_result']['output']}")
-```
-
-## Web Research
-
-Perform web research using the Firecrawl API:
-
-```python
-from app.tool.firecrawl_research import FirecrawlResearchTool
-
-research_tool = FirecrawlResearchTool()
-result = research_tool.run(
-    query="Latest advancements in quantum computing",
-    output_format="markdown",
-    include_visualizations=True
-)
-print(f"Research data saved to: {result['artifact_path']}")
-```
-
-## Optional Modules
-
-### Visualization Support
-
-The PDF generator can include data visualizations if matplotlib is installed. To enable this feature:
-
-```bash
-pip install matplotlib numpy
-```
-
-Without matplotlib, the system will still work but will display a message in the PDF when visualizations are requested.
-
-### Browser Automation
-
-For automating browser tasks, Selenium is used:
-
-```bash
-pip install selenium webdriver-manager
+result = agent.run(task)
 ```
 
 ### Web Research
 
-For web research capabilities, the firecrawl-py package is required:
+```python
+from app.tool.firecrawl_research import FirecrawlResearchTool
+
+research = FirecrawlResearchTool()
+result = research.run(
+    query="Large language model agents survey",
+    output_format="markdown"
+)
+```
+
+## Testing
 
 ```bash
-pip install firecrawl-py
+# Run all tests
+pytest tests/ -v
+
+# Run with coverage
+pytest tests/ --cov=app --cov-report=html
 ```
+
+## Project Structure
+
+```
+open-agent/
+├── app/
+│   ├── agent/          # Agent implementations
+│   ├── flow/           # Flow orchestration
+│   ├── prompt/         # System prompts
+│   ├── tool/           # Tool implementations
+│   ├── config.py       # Configuration management
+│   ├── llm.py          # LLM interface
+│   ├── logger.py       # Logging utilities
+│   └── schema.py       # Data models
+├── config/             # Configuration files
+├── tests/              # Test suite
+├── paper.md            # JOSS paper
+├── paper.bib           # References
+└── requirements.txt    # Dependencies
+```
+
+## Citation
+
+If you use OpenAgent in your research, please cite:
+
+```bibtex
+@article{zhang2026openagent,
+  title={OpenAgent: A Modular Framework for Autonomous Multi-Tool Agent Orchestration with Memory-Enabled Planning},
+  author={Zhang, Xinyu},
+  journal={Journal of Open Source Software},
+  year={2026}
+}
+```
+
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-[MIT License](LICENSE)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+
+- [LangChain](https://github.com/langchain-ai/langchain) for the foundational agent framework
+- [Firecrawl](https://firecrawl.dev) for web research capabilities
+- [OpenAgent Community](https://github.com/mannaandpoem/OpenAgent) for inspiration

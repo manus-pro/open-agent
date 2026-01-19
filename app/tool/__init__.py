@@ -1,5 +1,5 @@
 """
-Tool module for OpenManus Python Agent.
+Tool module for OpenAgent.
 """
 from app.tool.base import BaseTool, ToolRegistry
 from app.tool.file_saver import FileSaverTool

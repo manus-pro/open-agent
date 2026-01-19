@@ -51,4 +51,9 @@ logs/
 
 # Generated files
 output/
-temp/ 
+temp/
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/ 

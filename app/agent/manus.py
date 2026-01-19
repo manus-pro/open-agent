@@ -24,7 +24,7 @@ from app.agent.planning import PlanningAgent
 
 class ManusAgent(BaseAgent):
     """
-    The Manus Agent, based on the OpenManus project.
+    The primary orchestrator agent for OpenAgent.
     Uses LangChain's OpenAI Functions Agent for task execution.
     """
     
@@ -348,7 +348,7 @@ For code generation, write clean, well-documented code following best practices.
 
 class Manus:
     """
-    Main Manus class for interfacing with the OpenManus agent.
+    Main interface class for the OpenAgent system.
     """
     
     def __init__(self):

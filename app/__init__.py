@@ -1,12 +1,12 @@
 """
-OpenManus Python Agent Package
+OpenAgent Python Agent Package
 """
 import os
 import sys
 from app.logger import get_logger
 
 # Set up logger
-logger = get_logger("open-manus")
+logger = get_logger("open-agent")
 
 # Import and initialize tool registry
 from app.tool.tool_collection import registry
