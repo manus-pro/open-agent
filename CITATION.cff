@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "OpenAgent: A Modular Framework for Autonomous Multi-Tool Agent Orchestration with Memory-Enabled Planning"
+version: "0.1.0"
+date-released: "2026-01-18"
+license: "MIT"
+repository-code: "https://github.com/manus-pro/open-agent"
+url: "https://github.com/manus-pro/open-agent"
+keywords:
+  - "LLM agents"
+  - "autonomous agents"
+  - "tool orchestration"
+  - "task planning"
+  - "Python"
+authors:
+  - family-names: "Zhang"
+    given-names: "Xinyu"
+    orcid: "https://orcid.org/0009-0003-5276-7086"
+    affiliation: "Independent Researcher"

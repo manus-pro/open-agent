@@ -1,0 +1,30 @@
+{
+  "title": "OpenAgent: A Modular Framework for Autonomous Multi-Tool Agent Orchestration with Memory-Enabled Planning",
+  "upload_type": "software",
+  "publication_date": "2026-01-18",
+  "version": "0.1.0",
+  "description": "OpenAgent is a modular Python framework for building autonomous LLM agents that decompose user requests into plans, orchestrate multiple tools, and preserve intermediate artifacts and context across steps. It provides a layered architecture with specialized agents, a tool registry, and flow orchestration for reproducible multi-step workflows.",
+  "creators": [
+    {
+      "name": "Zhang, Xinyu",
+      "orcid": "0009-0003-5276-7086",
+      "affiliation": "Independent Researcher"
+    }
+  ],
+  "license": "MIT",
+  "keywords": [
+    "LLM agents",
+    "autonomous agents",
+    "tool orchestration",
+    "task planning",
+    "Python"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/manus-pro/open-agent",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    }
+  ],
+  "access_right": "open"
+}

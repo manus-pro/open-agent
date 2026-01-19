@@ -3,7 +3,15 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# macOS
+.DS_Store
+
+# Artifacts and releases
 artifacts/
+releases/
+
+# ArXiv submission (separate venue)
+arxiv/
 # C extensions
 *.so
 

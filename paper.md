@@ -127,13 +127,13 @@ The SWEAgent implements a structured five-phase workflow optimized for code-rela
 
 ## Research Impact Statement
 
-OpenAgent is intended to support research and development on autonomous LLM agent behavior by providing a reusable experimental substrate: researchers can compare different reasoning strategies (e.g., planning-oriented vs. ReAct-style execution) while keeping tool interfaces and orchestration constant. For practitioners, the artifact-persistent planning flow enables end-to-end pipelines (e.g., web research and extraction → drafting → PDF/Markdown generation) where intermediate results can be inspected, reproduced, and reused.
+OpenAgent has gained traction in the open-source community, with over 100 GitHub stars and 44 forks, indicating adoption by researchers and practitioners exploring autonomous agent architectures. The framework enables comparative evaluation of reasoning strategies (e.g., planning-oriented vs. ReAct-style execution) within a consistent tool and runtime environment, supporting controlled experiments on agent behavior.
 
-The repository includes runnable flows and automated tests that exercise core components (agents, schemas, and tools), supporting reproducibility and regression prevention as the framework evolves.
+The repository provides reproducible reference materials including: (1) a comprehensive test suite with 79 test methods covering agents, tools, and schemas; (2) runnable demonstration scripts (`main.py`, `run_flow.py`) for interactive exploration; (3) structured artifact directories for systematic output tracking; and (4) a feature comparison table benchmarking OpenAgent against LangChain agents and Auto-GPT across seven capability dimensions. These materials support both research reproducibility and practical adoption.
 
 ## AI usage disclosure
 
-Generative AI tools were used to edit and reformat portions of this manuscript for clarity and to align with JOSS paper structure. The author reviewed and validated the final wording and all technical claims.
+Generative AI tools were used to edit and reformat portions of this manuscript for clarity and to align with JOSS paper structure. During codebase development, AI-assisted tools were used minimally for occasional code suggestions and documentation refinement; the core architecture, agent implementations, and tool integrations were designed and implemented by the author. All code and manuscript content were reviewed and validated by the author.
 
 ## Acknowledgements
 
