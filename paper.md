@@ -10,22 +10,22 @@ tags:
 authors:
   - name: Xinyu Zhang
     orcid: 0009-0003-5276-7086
-    affiliation: 1
+    affiliation: "1"
     corresponding: true
 affiliations:
-  - name: Independent Researcher
-    index: 1
+  - index: 1
+    name: Independent Researcher
 date: 18 January 2026
 bibliography: paper.bib
 ---
 
-# Summary
+## Summary
 
-Large Language Models (LLMs) have demonstrated remarkable capabilities in natural language understanding and generation, yet their integration into autonomous systems that can execute complex, multi-step tasks remains a significant research challenge [@wei2022chain; @yao2023react]. **OpenAgent** addresses this gap by providing a modular, extensible framework for building autonomous agents that can decompose high-level user instructions into executable plans, maintain context through memory-enabled execution, and orchestrate multiple specialized tools to accomplish diverse objectives.
+Large Language Models (LLMs) have demonstrated strong capabilities in natural language understanding and generation, yet turning these models into autonomous systems that can reliably execute complex, multi-step tasks remains challenging [@wei2022chain; @yao2023react]. OpenAgent is a modular, extensible Python framework for building autonomous agents that decompose user requests into plans, orchestrate multiple tools, and preserve intermediate artifacts and context across steps.
 
-The framework introduces a hierarchical agent architecture where specialized agents (Manus, Planning, ReAct, SWE) inherit from a common base while implementing distinct reasoning paradigms. A novel contribution is the *memory-enabled planning execution* system, which maintains artifact context across multi-step workflows, enabling agents to utilize intermediate results from previous steps—a capability essential for complex research and document generation tasks.
+The framework provides a hierarchical agent architecture where specialized agents (e.g., planning-oriented, ReAct-style, and software-engineering focused) share a common base interface while implementing distinct reasoning and execution strategies. A key contribution is memory-enabled multi-step execution: OpenAgent tracks intermediate artifacts and summaries to support stateful workflows where later steps can explicitly build on earlier results, enabling tasks such as research-driven document generation and iterative code changes.
 
-# Statement of Need
+## Statement of Need
 
 Existing LLM agent frameworks often require significant boilerplate code and lack principled abstractions for multi-tool orchestration. Researchers and practitioners building AI assistants face challenges in:
 
@@ -38,13 +38,29 @@ OpenAgent addresses these needs through its layered architecture: a **Tool Regis
 
 The framework targets AI researchers studying agent architectures, developers building task automation systems, and organizations requiring document generation pipelines with integrated web research capabilities.
 
-# Architecture and Design
+## State of the Field
+
+Recent work has explored tool-augmented LLMs and agentic workflows, including tool-use training and tool learning [@schick2023toolformer; @qin2023tool], surveys of LLM agents [@wang2023survey; @xi2023rise], and composable application frameworks [@chase2022langchain]. Community systems such as Auto-GPT [@significant2023autogpt], CAMEL [@li2023camel], and MetaGPT [@hong2024metagpt] popularized autonomous and multi-agent task execution but often couple planning, tool selection, and execution logic in ways that are difficult to adapt for controlled experiments or specialized domains.
+
+OpenAgent focuses on modularity and experimentation: it separates (i) agent reasoning strategies, (ii) tool definitions and execution, and (iii) flow orchestration into clear abstractions. This separation supports comparative evaluation of reasoning paradigms (e.g., planning vs. ReAct) within a consistent tool/runtime environment, and it enables workflows that require explicit artifact persistence across steps.
+
+| Feature | LangChain agents [@chase2022langchain] | Auto-GPT [@significant2023autogpt] | OpenAgent |
+|---------|------------------------------|------------------------------|-----------|
+| Memory-enabled multi-step execution | Limited | Yes | **Yes** |
+| Modular tool registry | Yes | Limited | **Yes** |
+| Multi-agent specialization | Limited | No | **Yes** |
+| Artifact tracking | No | Partial | **Yes** |
+| Graceful fallback on tool failure | No | No | **Yes** |
+| ReAct reasoning traces | Via LCEL | No | **Yes** |
+| Software-engineering workflow support | No | No | **Yes** |
+
+## Software Design
 
 OpenAgent implements a three-tier architecture as illustrated in Figure 1:
 
 ![OpenAgent Architecture](figures/architecture.png)
 
-## Agent Layer
+### Agent Layer
 
 The agent hierarchy implements the Strategy pattern, allowing runtime selection of reasoning approaches:
 
@@ -53,7 +69,7 @@ The agent hierarchy implements the Strategy pattern, allowing runtime selection 
 - **ReactAgent**: Implements the Reasoning-and-Acting paradigm [@yao2023react] with explicit Thought-Action-Observation cycles, tool selection with fuzzy matching, and configurable iteration limits
 - **SWEAgent**: Software engineering specialist following a structured workflow (UNDERSTAND → PLAN → IMPLEMENT → VERIFY → ITERATE) with automatic code verification and iterative bug fixing
 
-## Tool Layer
+### Tool Layer
 
 The `BaseTool` abstraction provides:
 - Standardized parameter schemas using JSON Schema
@@ -69,67 +85,37 @@ Currently integrated tools include:
 - **BashTool/PythonExecuteTool**: Shell and Python code execution with timeout handling
 - **StrReplaceEditorTool**: Text and code file editing via search-and-replace operations
 
-## Flow Layer
+### Flow Layer
 
 Flows compose agents and tools into reusable pipelines. The `PlanningFlow` demonstrates sophisticated orchestration:
 
-```python
-execution_results = self._execute_plan(
-    plan=plan,
-    task_description=task_input.task_description,
-    memory_enabled=True,  # Key innovation: context persistence
-    store_artifacts=True,
-    output_path=output_path
-)
-```
+Rather than running as isolated, stateless calls, flows can pass structured task descriptions, execution state, and stored artifacts through multi-step pipelines, enabling reproducible runs of complex tasks (e.g., research → outline → draft → export).
 
-# Key Technical Contributions
+## Key Technical Contributions
 
-## Memory-Enabled Multi-Step Execution
+### Memory-Enabled Multi-Step Execution
 
 Unlike stateless agent invocations, OpenAgent's planning system maintains an `artifact_memory` dictionary that accumulates context across steps:
 
-```python
-if memory_enabled:
-    artifact_memory[f"step_{step_number}_content"] = tool_result["content"]
-    artifact_memory[f"step_{step_number}_summary"] = summary
-```
-
 Subsequent steps receive this accumulated context, enabling coherent multi-document workflows where later steps can reference and build upon earlier results.
 
-## Dynamic Tool Selection with Fallback
+### Dynamic Tool Selection with Fallback
 
 The framework implements graceful degradation: when tool execution fails, an LLM-based fallback generates synthetic results, ensuring workflow completion even under partial failures.
 
-## Task-Type Inference
+### Task-Type Inference
 
 An initial LLM call classifies user input as either conversational or task-oriented, routing requests to appropriate handling paths:
 
-```python
-is_task, plan = self._infer_task_and_plan(task_description)
-if not is_task:
-    # Handle as conversational query
-else:
-    # Execute multi-step plan
-```
+This routing supports lightweight conversational responses as well as multi-step execution when the input is task-like.
 
-## ReAct Reasoning Implementation
+### ReAct Reasoning Implementation
 
 The ReactAgent implements the ReAct paradigm [@yao2023react] with explicit reasoning traces:
 
-```python
-# ReAct loop: Thought -> Action -> Observation -> Repeat
-for iteration in range(max_iterations):
-    response = llm_manager.generate_text(prompt, system_prompt=REACT_SYSTEM_PROMPT)
-    action_name, params, final_answer = self._parse_action(response)
-    if final_answer:
-        return TaskOutput(success=True, result=final_answer, metadata={"trace": trace})
-    observation = self._execute_tool(action_name, params)
-```
-
 This approach provides transparency through the complete reasoning trace, fuzzy tool name matching for robustness, and configurable iteration limits to prevent infinite loops.
 
-## Software Engineering Workflow
+### Software Engineering Workflow
 
 The SWEAgent implements a structured five-phase workflow optimized for code-related tasks:
 
@@ -139,40 +125,18 @@ The SWEAgent implements a structured five-phase workflow optimized for code-rela
 4. **VERIFY**: Automatic execution and testing of generated code
 5. **ITERATE**: Error-driven refinement using LLM debugging prompts
 
-# Comparison with Related Work
+## Research Impact Statement
 
-| Feature | LangChain Agents | AutoGPT | OpenAgent |
-|---------|-----------------|---------|-----------|
-| Memory-enabled planning | Limited | Yes | **Yes** |
-| Modular tool registry | Yes | Limited | **Yes** |
-| Multi-agent specialization | Limited | No | **Yes** |
-| Artifact tracking | No | Partial | **Yes** |
-| Graceful fallback | No | No | **Yes** |
-| ReAct reasoning traces | Via LCEL | No | **Yes** |
-| SWE workflow integration | No | No | **Yes** |
+OpenAgent is intended to support research and development on autonomous LLM agent behavior by providing a reusable experimental substrate: researchers can compare different reasoning strategies (e.g., planning-oriented vs. ReAct-style execution) while keeping tool interfaces and orchestration constant. For practitioners, the artifact-persistent planning flow enables end-to-end pipelines (e.g., web research and extraction → drafting → PDF/Markdown generation) where intermediate results can be inspected, reproduced, and reused.
 
-# Installation and Usage
+The repository includes runnable flows and automated tests that exercise core components (agents, schemas, and tools), supporting reproducibility and regression prevention as the framework evolves.
 
-```bash
-pip install open-agent
-```
+## AI usage disclosure
 
-Basic usage:
+Generative AI tools were used to edit and reformat portions of this manuscript for clarity and to align with JOSS paper structure. The author reviewed and validated the final wording and all technical claims.
 
-```python
-from app.agent.manus import Manus
-import asyncio
-
-agent = Manus()
-asyncio.run(agent.run("Research quantum computing advances and generate a PDF report"))
-```
-
-# Documentation and Community
-
-Comprehensive documentation is available at the project repository. The framework follows semantic versioning and maintains a changelog. Contributions are welcomed through GitHub issues and pull requests following the contribution guidelines.
-
-# Acknowledgements
+## Acknowledgements
 
 We thank the LangChain and OpenAI communities for foundational libraries, and the Firecrawl team for the web research API.
 
-# References
+## References
